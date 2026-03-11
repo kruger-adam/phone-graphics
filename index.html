@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>VYBE</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --app-name: "VYBE";
+      --brand: #1a1a2e;
+      --accent: #e94560;
+      --bg: #ffffff;
+      --surface: #fafafa;
+      --border: #efefef;
+      --text: #111111;
+      --text-sub: #737373;
+      --text-light: #999999;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      background: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font);
+    }
+
+    /* Phone shell - for desktop preview */
+    .phone-shell {
+      width: 393px;
+      height: 852px;
+      background: var(--bg);
+      border-radius: 50px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.35), inset 0 0 0 1.5px #c8c8c8, inset 0 0 0 3px #1a1a1a;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Status bar */
+    .status-bar {
+      height: 54px;
+      background: var(--bg);
+      display: flex;
+      align-items: flex-end;
+      padding: 0 30px 10px;
+      justify-content: space-between;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .status-time { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+
+    .status-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .status-icons svg { width: 16px; height: 16px; }
+
+    /* Dynamic island */
+    .dynamic-island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 34px;
+      background: #000;
+      border-radius: 20px;
+    }
+
+    /* App header */
+    .app-header {
+      height: 52px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      justify-content: space-between;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 9;
+    }
+
+    .app-logo {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: var(--brand);
+    }
+
+    .app-logo span { color: var(--accent); }
+
+    .header-icons { display: flex; gap: 18px; align-items: center; }
+    .header-icons svg { width: 24px; height: 24px; color: var(--text); }
+
+    /* Feed scroll area */
+    .feed {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: var(--bg);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .feed::-webkit-scrollbar { display: none; }
+
+    /* Stories */
+    .stories-row {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      display: flex;
+      gap: 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .stories-row::-webkit-scrollbar { display: none; }
+
+    .story-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 0 10px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .story-ring {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      padding: 2.5px;
+      background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    }
+
+    .story-ring.seen {
+      background: #c7c7c7;
+    }
+
+    .story-ring.add {
+      background: var(--border);
+    }
+
+    .story-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 2.5px solid var(--bg);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      position: relative;
+    }
+
+    .story-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .story-add-icon {
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 20px;
+      height: 20px;
+      background: var(--accent);
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .story-label {
+      font-size: 11px;
+      color: var(--text);
+      text-align: center;
+      max-width: 64px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Post */
+    .post {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      gap: 10px;
+    }
+
+    .post-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--surface);
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .post-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .post-meta { flex: 1; }
+
+    .post-username {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .post-location {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 1px;
+    }
+
+    .post-more {
+      color: var(--text);
+      font-size: 20px;
+      line-height: 1;
+      padding: 4px;
+    }
+
+    /* Post image */
+    .post-image {
+      width: 100%;
+      aspect-ratio: 1;
+      background: var(--surface);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .post-image.portrait { aspect-ratio: 4/5; }
+    .post-image.landscape { aspect-ratio: 16/9; }
+
+    .post-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .post-image .placeholder {
+      font-size: 64px;
+      opacity: 0.15;
+    }
+
+    /* Gradient overlay posts */
+    .post-image .overlay-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .post-image.gradient-1 { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .post-image.gradient-2 { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .post-image.gradient-3 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+    .post-image.gradient-4 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+    .post-image.gradient-5 { background: linear-gradient(135deg, #fa709a, #fee140); }
+    .post-image.gradient-6 { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
+    .post-image.dark-1 { background: linear-gradient(160deg, #0f0c29, #302b63, #24243e); }
+
+    .overlay-quote {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.35;
+      letter-spacing: -0.3px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+
+    .overlay-author {
+      font-size: 12px;
+      margin-top: 12px;
+      opacity: 0.75;
+    }
+
+    /* Post actions */
+    .post-actions {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px 4px;
+      gap: 16px;
+    }
+
+    .post-actions svg {
+      width: 26px;
+      height: 26px;
+      color: var(--text);
+    }
+
+    .action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      color: var(--text);
+    }
+
+    .action-btn.liked svg { color: var(--accent); fill: var(--accent); }
+
+    .spacer { flex: 1; }
+
+    .bookmark-btn { margin-left: auto; }
+
+    /* Post stats */
+    .post-stats {
+      padding: 2px 12px 6px;
+    }
+
+    .post-likes {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Post caption */
+    .post-caption {
+      padding: 2px 12px 8px;
+      font-size: 13.5px;
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .post-caption .username {
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    .post-caption .hashtag { color: #00376b; }
+
+    .post-more-caption {
+      color: var(--text-light);
+      font-size: 13.5px;
+    }
+
+    /* Comments */
+    .post-comments {
+      padding: 0 12px 4px;
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    /* Timestamp */
+    .post-time {
+      padding: 0 12px 12px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-light);
+    }
+
+    /* Bottom nav */
+    .bottom-nav {
+      height: 82px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      padding-top: 12px;
+      flex-shrink: 0;
+    }
+
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+
+    .nav-item svg { width: 26px; height: 26px; color: var(--text); }
+    .nav-item.active svg { color: var(--brand); }
+
+    .nav-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: var(--surface);
+      border: 2px solid transparent;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+
+    .nav-item.active .nav-avatar { border-color: var(--brand); }
+
+    /* Editor panel */
+    .editor-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--brand);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      font-family: var(--font);
+    }
+
+    .editor-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 420px;
+      height: 100vh;
+      background: #1a1a2e;
+      color: white;
+      z-index: 999;
+      overflow-y: auto;
+      padding: 24px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      font-family: var(--font);
+    }
+
+    .editor-panel.open { transform: translateX(0); }
+
+    .editor-panel h2 {
+      font-size: 18px;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+
+    .editor-panel p.sub {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 24px;
+    }
+
+    .editor-section { margin-bottom: 28px; }
+
+    .editor-section h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .editor-panel label {
+      display: block;
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 4px;
+      margin-top: 10px;
+    }
+
+    .editor-panel input, .editor-panel select, .editor-panel textarea {
+      width: 100%;
+      background: #0f0f1e;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: white;
+      padding: 8px 10px;
+      font-size: 13px;
+      font-family: var(--font);
+      outline: none;
+    }
+
+    .editor-panel input:focus, .editor-panel select:focus, .editor-panel textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .editor-panel textarea { resize: vertical; min-height: 60px; }
+
+    .editor-panel select option { background: #1a1a2e; }
+
+    .post-card {
+      background: #0f0f1e;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #2a2a4e;
+    }
+
+    .post-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .post-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ddd;
+    }
+
+    .post-card-actions { display: flex; gap: 8px; }
+
+    .btn-sm {
+      background: none;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #aaa;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+
+    .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm.danger:hover { border-color: #ff4444; color: #ff4444; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover { opacity: 0.9; }
+
+    .color-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .color-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.15s;
+    }
+
+    .color-swatch.selected { border-color: white; }
+
+    /* Drag handles */
+    .drag-handle {
+      cursor: grab;
+      color: #555;
+      font-size: 16px;
+      margin-right: 6px;
+    }
+
+    /* App branding config */
+    .brand-preview {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: #fff;
+      margin-top: 6px;
+    }
+
+    .brand-preview span { color: var(--accent); }
+
+    /* Notification dot */
+    .notif-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      right: 2px;
+    }
+
+    /* Heart animation */
+    @keyframes heartPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4); }
+      100% { transform: scale(1); }
+    }
+
+    .action-btn.liked { animation: heartPop 0.3s ease; }
+
+    /* Verified badge */
+    .verified {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 3px;
+    }
+
+    .verified svg { width: 13px; height: 13px; color: #0095f6; }
+
+    /* Post carousel dots */
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px 0 4px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+
+    .dot.active {
+      background: #0095f6;
+      width: 6px;
+    }
+
+    @media (max-width: 480px) {
+      html, body { background: var(--bg); align-items: stretch; justify-content: stretch; }
+      .phone-shell { width: 100%; height: 100%; border-radius: 0; box-shadow: none; }
+      .editor-panel { width: 100%; }
+      .editor-toggle { top: 10px; right: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="editor-toggle" onclick="toggleEditor()">⚙ Edit Posts</button>
+
+<div class="editor-panel" id="editorPanel">
+  <h2>Post Editor</h2>
+  <p class="sub">Configure your feed for filming</p>
+
+  <div class="editor-section">
+    <h3>App Branding</h3>
+    <label>App Name</label>
+    <input type="text" id="appName" value="VYBE" oninput="updateBranding()">
+    <label>Accent Color</label>
+    <div class="color-row" id="accentColors">
+      <div class="color-swatch selected" style="background:#e94560" data-color="#e94560" onclick="setAccent(this)"></div>
+      <div class="color-swatch" style="background:#0095f6" data-color="#0095f6" onclick="setAccent(this)"></div>
+      <div class="color-swatch" style="background:#7c3aed" data-color="#7c3aed" onclick="setAccent(this)"></div>
+      <div class="color-swatch" style="background:#059669" data-color="#059669" onclick="setAccent(this)"></div>
+      <div class="color-swatch" style="background:#f59e0b" data-color="#f59e0b" onclick="setAccent(this)"></div>
+      <div class="color-swatch" style="background:#ec4899" data-color="#ec4899" onclick="setAccent(this)"></div>
+      <div class="color-swatch" style="background:#ef4444" data-color="#ef4444" onclick="setAccent(this)"></div>
+    </div>
+  </div>
+
+  <div class="editor-section">
+    <h3>Posts</h3>
+    <div id="postList"></div>
+    <button class="btn-primary" onclick="addPost()">+ Add Post</button>
+  </div>
+
+  <div class="editor-section">
+    <h3>Stories</h3>
+    <p style="font-size:12px;color:#888;margin-bottom:8px;">Configure story bubbles at the top</p>
+    <div id="storyList"></div>
+    <button class="btn-primary" onclick="addStory()">+ Add Story</button>
+  </div>
+
+  <div class="editor-section">
+    <h3>Filming Tips</h3>
+    <p style="font-size:12px;color:#888;line-height:1.6;">
+      • Scroll slowly — the feed is fully interactive<br>
+      • Tap the like button to toggle hearts<br>
+      • Use a phone frame prop for close-ups<br>
+      • Add the page to Home Screen for full-screen mode<br>
+      • Close this panel before filming
+    </p>
+  </div>
+</div>
+
+<div class="phone-shell">
+  <!-- Status bar -->
+  <div class="status-bar">
+    <div class="dynamic-island"></div>
+    <span class="status-time" id="statusTime">9:41</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1.5 8.5C5.372 4.627 10.186 2.5 12 2.5s6.628 2.127 10.5 6L21 10c-3.226-3.226-7.186-5.5-9-5.5S6.226 6.774 3 10L1.5 8.5z"/><path d="M5 12c1.881-1.881 4.416-3 7-3s5.119 1.119 7 3l-1.5 1.5C15.685 11.685 13.842 11 12 11s-3.685.685-5 2L5 12z"/><path d="M8.5 15.5C9.329 14.671 10.664 14 12 14s2.671.671 3.5 1.5L12 19l-3.5-3.5z"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="1" y="6" width="22" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><rect x="3" y="8" width="15" height="8" rx="1.5"/><path d="M23 10v4a2 2 0 000-4z"/></svg>
+    </div>
+  </div>
+
+  <!-- App header -->
+  <div class="app-header">
+    <div class="app-logo" id="appLogo">V<span>Y</span>BE</div>
+    <div class="header-icons">
+      <button class="action-btn" style="position:relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </button>
+      <button class="action-btn" style="position:relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <div class="notif-dot"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Feed -->
+  <div class="feed" id="feed">
+
+    <!-- Stories row -->
+    <div class="stories-row" id="storiesRow"></div>
+
+    <!-- Posts inject here -->
+    <div id="postsContainer"></div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </div>
+    <div class="nav-item">
+      <div class="nav-avatar" id="navAvatar">👤</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Default data ──────────────────────────────────────────────
+
+const DEFAULT_STORIES = [
+  { id: 's1', username: 'Your Story', emoji: '😊', seen: false, isAdd: true },
+  { id: 's2', username: 'maya_r', emoji: '🌿', seen: false },
+  { id: 's3', username: 'jkyle', emoji: '🎸', seen: false },
+  { id: 's4', username: 'thea.c', emoji: '☀️', seen: true },
+  { id: 's5', username: 'dom', emoji: '🏙️', seen: true },
+];
+
+const DEFAULT_POSTS = [
+  {
+    id: 'p1',
+    username: 'maya_r',
+    verified: false,
+    location: 'London, UK',
+    emoji: '🌿',
+    imageType: 'gradient',
+    gradient: 'gradient-4',
+    overlayText: 'the world keeps spinning whether you do or not',
+    likes: '2,341',
+    caption: 'slow mornings are underrated ✨',
+    hashtags: '#slowliving #morning #peace',
+    comments: 'View all 48 comments',
+    time: '2 HOURS AGO',
+    liked: false,
+    saved: false,
+  },
+  {
+    id: 'p2',
+    username: 'jkyle',
+    verified: true,
+    location: '',
+    emoji: '🎸',
+    imageType: 'gradient',
+    gradient: 'gradient-1',
+    overlayText: '',
+    likes: '18,203',
+    caption: 'new ep out friday. been working on this one for a long time 🖤',
+    hashtags: '#music #indie #newmusic',
+    comments: 'View all 312 comments',
+    time: '5 HOURS AGO',
+    liked: true,
+    saved: false,
+  },
+  {
+    id: 'p3',
+    username: 'thea.c',
+    verified: false,
+    location: 'Hackney, London',
+    emoji: '☀️',
+    imageType: 'gradient',
+    gradient: 'gradient-5',
+    overlayText: 'romanticise your life or no one else will',
+    likes: '934',
+    caption: 'golden hour hit different today',
+    hashtags: '#photography #london #goldenhour',
+    comments: 'View all 27 comments',
+    time: '8 HOURS AGO',
+    liked: false,
+    saved: true,
+  },
+  {
+    id: 'p4',
+    username: 'dom',
+    verified: false,
+    location: '',
+    emoji: '🏙️',
+    imageType: 'gradient',
+    gradient: 'dark-1',
+    overlayText: '',
+    likes: '445',
+    caption: 'city never sleeps and neither do i apparently',
+    hashtags: '#nightlife #city #insomnia',
+    comments: 'View all 14 comments',
+    time: '11 HOURS AGO',
+    liked: false,
+    saved: false,
+  },
+];
+
+// ─── State ─────────────────────────────────────────────────────
+
+let state = {
+  appName: 'VYBE',
+  accent: '#e94560',
+  posts: JSON.parse(JSON.stringify(DEFAULT_POSTS)),
+  stories: JSON.parse(JSON.stringify(DEFAULT_STORIES)),
+};
+
+// Load saved state
+try {
+  const saved = localStorage.getItem('phoneGraphicsState');
+  if (saved) state = JSON.parse(saved);
+} catch(e) {}
+
+function save() {
+  try { localStorage.setItem('phoneGraphicsState', JSON.stringify(state)); } catch(e) {}
+}
+
+// ─── Render feed ───────────────────────────────────────────────
+
+function renderFeed() {
+  renderStories();
+  renderPosts();
+}
+
+function renderStories() {
+  const row = document.getElementById('storiesRow');
+  row.innerHTML = state.stories.map(s => `
+    <div class="story-item">
+      <div class="story-ring ${s.seen ? 'seen' : ''} ${s.isAdd ? 'add' : ''}">
+        <div class="story-avatar">
+          ${s.emoji}
+          ${s.isAdd ? '<div class="story-add-icon">+</div>' : ''}
+        </div>
+      </div>
+      <span class="story-label">${s.username}</span>
+    </div>
+  `).join('');
+}
+
+function renderPosts() {
+  const container = document.getElementById('postsContainer');
+  container.innerHTML = state.posts.map(post => renderPost(post)).join('');
+}
+
+function renderPost(post) {
+  const imageContent = post.imageType === 'gradient'
+    ? `<div class="post-image ${post.gradient || 'gradient-1'}">
+        ${post.overlayText ? `<div class="overlay-text"><div class="overlay-quote">${escHtml(post.overlayText)}</div></div>` : ''}
+       </div>`
+    : `<div class="post-image"><div class="placeholder">🖼️</div></div>`;
+
+  const verifiedBadge = post.verified
+    ? `<span class="verified"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></span>`
+    : '';
+
+  const hashtags = post.hashtags
+    ? post.hashtags.split(' ').map(t => `<span class="hashtag">${escHtml(t)}</span>`).join(' ')
+    : '';
+
+  return `
+    <div class="post" id="post-${post.id}">
+      <div class="post-header">
+        <div class="post-avatar">${post.emoji || '👤'}</div>
+        <div class="post-meta">
+          <div class="post-username">${escHtml(post.username)}${verifiedBadge}</div>
+          ${post.location ? `<div class="post-location">${escHtml(post.location)}</div>` : ''}
+        </div>
+        <div class="post-more">···</div>
+      </div>
+
+      ${imageContent}
+
+      <div class="post-actions">
+        <button class="action-btn ${post.liked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+          <svg viewBox="0 0 24 24" fill="${post.liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </button>
+        <button class="action-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </button>
+        <button class="action-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+        <div class="spacer"></div>
+        <button class="action-btn bookmark-btn" onclick="toggleSave('${post.id}')">
+          <svg viewBox="0 0 24 24" fill="${post.saved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="post-stats">
+        <span class="post-likes" id="likes-${post.id}">${escHtml(post.likes)} likes</span>
+      </div>
+
+      <div class="post-caption">
+        <span class="username">${escHtml(post.username)}</span>
+        ${escHtml(post.caption)}
+        ${hashtags ? ' ' + hashtags : ''}
+      </div>
+
+      ${post.comments ? `<div class="post-comments">${escHtml(post.comments)}</div>` : ''}
+
+      <div class="post-time">${escHtml(post.time)}</div>
+    </div>
+  `;
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── Interactions ──────────────────────────────────────────────
+
+function toggleLike(id) {
+  const post = state.posts.find(p => p.id === id);
+  if (!post) return;
+  post.liked = !post.liked;
+  // Update just the affected elements
+  const btn = document.querySelector(`#post-${id} .action-btn`);
+  const svg = btn?.querySelector('svg');
+  if (btn) btn.classList.toggle('liked', post.liked);
+  if (svg) svg.setAttribute('fill', post.liked ? 'currentColor' : 'none');
+  save();
+}
+
+function toggleSave(id) {
+  const post = state.posts.find(p => p.id === id);
+  if (!post) return;
+  post.saved = !post.saved;
+  const btn = document.querySelector(`#post-${id} .bookmark-btn svg`);
+  if (btn) btn.setAttribute('fill', post.saved ? 'currentColor' : 'none');
+  save();
+}
+
+// ─── Editor ────────────────────────────────────────────────────
+
+function toggleEditor() {
+  document.getElementById('editorPanel').classList.toggle('open');
+  renderEditor();
+}
+
+function renderEditor() {
+  document.getElementById('appName').value = state.appName;
+  // highlight active accent
+  document.querySelectorAll('.color-swatch').forEach(s => {
+    s.classList.toggle('selected', s.dataset.color === state.accent);
+  });
+  renderPostList();
+  renderStoryList();
+}
+
+function renderPostList() {
+  const list = document.getElementById('postList');
+  list.innerHTML = state.posts.map((post, i) => `
+    <div class="post-card">
+      <div class="post-card-header">
+        <span class="post-card-title">${post.emoji || '📷'} @${post.username}</span>
+        <div class="post-card-actions">
+          <button class="btn-sm" onclick="editPost('${post.id}')">Edit</button>
+          <button class="btn-sm danger" onclick="deletePost('${post.id}')">✕</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#666;">${post.caption?.slice(0,60) || '—'}${post.caption?.length > 60 ? '…' : ''}</div>
+    </div>
+  `).join('');
+}
+
+function renderStoryList() {
+  const list = document.getElementById('storyList');
+  list.innerHTML = state.stories.map((s, i) => `
+    <div class="post-card">
+      <div class="post-card-header">
+        <span class="post-card-title">${s.emoji || '👤'} ${s.username}</span>
+        <div class="post-card-actions">
+          <button class="btn-sm" onclick="editStory('${s.id}')">Edit</button>
+          <button class="btn-sm danger" onclick="deleteStory('${s.id}')">✕</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addPost() {
+  const id = 'p' + Date.now();
+  state.posts.unshift({
+    id,
+    username: 'newuser',
+    verified: false,
+    location: '',
+    emoji: '📷',
+    imageType: 'gradient',
+    gradient: 'gradient-1',
+    overlayText: '',
+    likes: '0',
+    caption: 'Add your caption here',
+    hashtags: '',
+    comments: '',
+    time: 'JUST NOW',
+    liked: false,
+    saved: false,
+  });
+  save();
+  renderFeed();
+  renderPostList();
+  editPost(id);
+}
+
+function editPost(id) {
+  const post = state.posts.find(p => p.id === id);
+  if (!post) return;
+
+  const gradients = ['gradient-1','gradient-2','gradient-3','gradient-4','gradient-5','gradient-6','dark-1'];
+
+  const panel = document.getElementById('editorPanel');
+  // Insert inline form
+  const existing = document.getElementById('postEditForm');
+  if (existing) existing.remove();
+
+  const form = document.createElement('div');
+  form.id = 'postEditForm';
+  form.style.cssText = 'background:#0f0f1e;border-radius:10px;padding:16px;margin-top:16px;border:1px solid #e9456033;';
+  form.innerHTML = `
+    <h3 style="font-size:13px;color:#e94560;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Editing @${post.username}</h3>
+    <label>Username</label>
+    <input id="ef-username" value="${escHtml(post.username)}">
+    <label>Emoji / Avatar</label>
+    <input id="ef-emoji" value="${post.emoji || ''}">
+    <label>Location (optional)</label>
+    <input id="ef-location" value="${escHtml(post.location || '')}">
+    <label>Verified badge</label>
+    <select id="ef-verified">
+      <option value="false" ${!post.verified ? 'selected' : ''}>No</option>
+      <option value="true" ${post.verified ? 'selected' : ''}>Yes</option>
+    </select>
+    <label>Image Style</label>
+    <select id="ef-gradient">
+      ${gradients.map(g => `<option value="${g}" ${post.gradient === g ? 'selected' : ''}>${g}</option>`).join('')}
+    </select>
+    <label>Overlay Text (on image)</label>
+    <textarea id="ef-overlay">${escHtml(post.overlayText || '')}</textarea>
+    <label>Caption</label>
+    <textarea id="ef-caption">${escHtml(post.caption || '')}</textarea>
+    <label>Hashtags</label>
+    <input id="ef-hashtags" value="${escHtml(post.hashtags || '')}">
+    <label>Likes count</label>
+    <input id="ef-likes" value="${escHtml(post.likes || '0')}">
+    <label>Comment line</label>
+    <input id="ef-comments" value="${escHtml(post.comments || '')}">
+    <label>Timestamp</label>
+    <input id="ef-time" value="${escHtml(post.time || '')}">
+    <button class="btn-primary" onclick="savePost('${id}')">Save Post</button>
+    <button class="btn-sm" style="width:100%;margin-top:6px;text-align:center;" onclick="document.getElementById('postEditForm').remove()">Cancel</button>
+  `;
+  panel.appendChild(form);
+  form.scrollIntoView({ behavior: 'smooth' });
+}
+
+function savePost(id) {
+  const post = state.posts.find(p => p.id === id);
+  if (!post) return;
+  post.username = document.getElementById('ef-username').value;
+  post.emoji = document.getElementById('ef-emoji').value;
+  post.location = document.getElementById('ef-location').value;
+  post.verified = document.getElementById('ef-verified').value === 'true';
+  post.gradient = document.getElementById('ef-gradient').value;
+  post.overlayText = document.getElementById('ef-overlay').value;
+  post.caption = document.getElementById('ef-caption').value;
+  post.hashtags = document.getElementById('ef-hashtags').value;
+  post.likes = document.getElementById('ef-likes').value;
+  post.comments = document.getElementById('ef-comments').value;
+  post.time = document.getElementById('ef-time').value;
+  document.getElementById('postEditForm')?.remove();
+  save();
+  renderFeed();
+  renderPostList();
+}
+
+function deletePost(id) {
+  state.posts = state.posts.filter(p => p.id !== id);
+  save();
+  renderFeed();
+  renderPostList();
+}
+
+function addStory() {
+  const id = 's' + Date.now();
+  state.stories.push({ id, username: 'newuser', emoji: '👤', seen: false });
+  save();
+  renderStories();
+  renderStoryList();
+  editStory(id);
+}
+
+function editStory(id) {
+  const story = state.stories.find(s => s.id === id);
+  if (!story) return;
+
+  const existing = document.getElementById('storyEditForm');
+  if (existing) existing.remove();
+
+  const panel = document.getElementById('editorPanel');
+  const form = document.createElement('div');
+  form.id = 'storyEditForm';
+  form.style.cssText = 'background:#0f0f1e;border-radius:10px;padding:16px;margin-top:16px;border:1px solid #e9456033;';
+  form.innerHTML = `
+    <h3 style="font-size:13px;color:#e94560;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Editing story: ${story.username}</h3>
+    <label>Username</label>
+    <input id="sf-username" value="${escHtml(story.username)}">
+    <label>Emoji</label>
+    <input id="sf-emoji" value="${story.emoji || ''}">
+    <label>Seen (grey ring)</label>
+    <select id="sf-seen">
+      <option value="false" ${!story.seen ? 'selected' : ''}>No (coloured ring)</option>
+      <option value="true" ${story.seen ? 'selected' : ''}>Yes (grey ring)</option>
+    </select>
+    <button class="btn-primary" onclick="saveStory('${id}')">Save Story</button>
+    <button class="btn-sm" style="width:100%;margin-top:6px;text-align:center;" onclick="document.getElementById('storyEditForm').remove()">Cancel</button>
+  `;
+  panel.appendChild(form);
+  form.scrollIntoView({ behavior: 'smooth' });
+}
+
+function saveStory(id) {
+  const story = state.stories.find(s => s.id === id);
+  if (!story) return;
+  story.username = document.getElementById('sf-username').value;
+  story.emoji = document.getElementById('sf-emoji').value;
+  story.seen = document.getElementById('sf-seen').value === 'true';
+  document.getElementById('storyEditForm')?.remove();
+  save();
+  renderStories();
+  renderStoryList();
+}
+
+function deleteStory(id) {
+  state.stories = state.stories.filter(s => s.id !== id);
+  save();
+  renderStories();
+  renderStoryList();
+}
+
+function updateBranding() {
+  const name = document.getElementById('appName').value || 'VYBE';
+  state.appName = name;
+  // Update logo
+  const mid = Math.ceil(name.length / 2);
+  const logo = document.getElementById('appLogo');
+  logo.innerHTML = escHtml(name.slice(0, mid)) + '<span>' + escHtml(name.slice(mid, mid+1)) + '</span>' + escHtml(name.slice(mid+1));
+  save();
+}
+
+function setAccent(el) {
+  const color = el.dataset.color;
+  state.accent = color;
+  document.documentElement.style.setProperty('--accent', color);
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.toggle('selected', s === el));
+  save();
+}
+
+// ─── Clock ─────────────────────────────────────────────────────
+
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours();
+  const m = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('statusTime').textContent = `${h}:${m}`;
+}
+
+// ─── Init ──────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Apply saved accent
+  document.documentElement.style.setProperty('--accent', state.accent);
+  renderFeed();
+  updateClock();
+  setInterval(updateClock, 30000);
+});
+</script>
+</body>
+</html>
