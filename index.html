@@ -668,17 +668,25 @@
     }
 
     @media (max-width: 480px) {
-      html, body { background: var(--bg); overflow-x: hidden; }
+      html {
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+        display: block;
+      }
       .phone-shell {
         width: 100%;
-        min-height: 100vh;
-        min-height: 100dvh;
+        height: 100%;
         border-radius: 0;
         box-shadow: none;
+        overflow: hidden;
       }
-      .bottom-nav {
-        position: sticky;
-        bottom: 0;
+      .app-header {
+        padding-top: max(16px, env(safe-area-inset-top, 16px));
       }
       .editor-panel { width: 100%; }
     }
