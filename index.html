@@ -430,7 +430,7 @@
     /* Editor panel */
     .editor-toggle {
       position: fixed;
-      top: 20px;
+      top: calc(env(safe-area-inset-top, 20px) + 20px);
       right: 20px;
       background: var(--brand);
       color: white;
@@ -443,6 +443,22 @@
       z-index: 1000;
       box-shadow: 0 4px 16px rgba(0,0,0,0.2);
       font-family: var(--font);
+      transition: opacity 0.2s;
+    }
+
+    .editor-toggle.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Invisible tap target to restore button */
+    .restore-btn {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 60px;
+      height: 60px;
+      z-index: 999;
     }
 
     .editor-panel {
@@ -666,7 +682,8 @@
 </head>
 <body>
 
-<button class="editor-toggle" onclick="toggleEditor()">⚙ Edit Posts</button>
+<button class="editor-toggle" id="editorToggle" onclick="toggleEditor()">⚙ Edit Posts</button>
+<div class="restore-btn" onclick="showEditorBtn()"></div>
 
 <div class="editor-panel" id="editorPanel">
   <h2>Post Editor</h2>
@@ -708,8 +725,9 @@
       • Tap the like button to toggle hearts<br>
       • Use a phone frame prop for close-ups<br>
       • Add the page to Home Screen for full-screen mode<br>
-      • Close this panel before filming
+      • Hide this button before filming, tap top-right corner to restore
     </p>
+    <button class="btn-primary" style="margin-top:12px;background:#333;" onclick="hideEditorBtn()">Hide Edit Button for Filming</button>
   </div>
 </div>
 
@@ -1210,6 +1228,15 @@ function setAccent(el) {
 }
 
 // ─── Clock ─────────────────────────────────────────────────────
+
+function hideEditorBtn() {
+  document.getElementById('editorToggle').classList.add('hidden');
+  document.getElementById('editorPanel').classList.remove('open');
+}
+
+function showEditorBtn() {
+  document.getElementById('editorToggle').classList.remove('hidden');
+}
 
 function updateClock() {
   const now = new Date();
