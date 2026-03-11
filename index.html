@@ -392,12 +392,12 @@
 
     /* Bottom nav */
     .bottom-nav {
-      height: 82px;
       background: var(--bg);
       border-top: 1px solid var(--border);
       display: flex;
       align-items: flex-start;
       padding-top: 12px;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
       flex-shrink: 0;
     }
 
